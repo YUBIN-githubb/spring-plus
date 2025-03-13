@@ -14,8 +14,11 @@ import org.example.expert.domain.user.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -59,10 +62,30 @@ public class TodoService {
     }
 
     @Transactional(readOnly = true)
-    public Page<TodoResponse> getTodos(int page, int size) {
-        Pageable pageable = PageRequest.of(page - 1, size);
+    public Page<TodoResponse> getTodos(int page, int size, String weather, LocalDateTime startDate, LocalDateTime endDate) {
+        Page<Todo> todos;
+        Sort modifiedSort = Sort.by("modifiedAt").descending(); // 기본적으로 수정일 기준 내림차순 정렬
 
-        Page<Todo> todos = todoRepository.findAllByOrderByModifiedAtDesc(pageable);
+
+        if(weather != null && (startDate == null && endDate == null)) { // 기간 검색만 있는 경우
+
+            Pageable pageable = PageRequest.of(page - 1, size, modifiedSort);
+            todos = todoRepository.findAllByWeather(weather, pageable);
+
+        }else if(weather == null && (startDate != null && endDate != null)) { // 날씨 검색만 있는 경우
+
+            PageRequest pageable = PageRequest.of(page - 1, size, modifiedSort);
+            todos = todoRepository.findByModifiedAtBetween(startDate, endDate, pageable);
+
+        } else if (weather != null && (startDate != null && endDate != null)) { // 날씨검색, 날짜검색 둘 다 있는 경우
+
+            PageRequest pageable = PageRequest.of(page - 1, size, modifiedSort);
+            todos = todoRepository.findByWeatherAndModifiedAtBetween(weather, startDate, endDate, pageable);
+
+        } else { // 아무 조건도 걸지 않은 경우
+            Pageable pageable = PageRequest.of(page - 1, size, modifiedSort);
+            todos = todoRepository.findAll(pageable);
+        }
 
         return todos.map(todo -> new TodoResponse(
                 todo.getId(),
