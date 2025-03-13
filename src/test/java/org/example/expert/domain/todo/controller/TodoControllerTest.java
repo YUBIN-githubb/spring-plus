@@ -59,6 +59,7 @@ class TodoControllerTest {
     }
 
     @Test
+    // 에러 로그 : 200을 예상했는데 400이 나왔다
     void todo_단건_조회_시_todo가_존재하지_않아_예외가_발생한다() throws Exception {
         // given
         long todoId = 1L;
@@ -69,9 +70,8 @@ class TodoControllerTest {
 
         // then
         mockMvc.perform(get("/todos/{todoId}", todoId))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value(HttpStatus.OK.name()))
-                .andExpect(jsonPath("$.code").value(HttpStatus.OK.value()))
-                .andExpect(jsonPath("$.message").value("Todo not found"));
+                .andExpect(status().isBadRequest()) // 400일 것이다
+                .andExpect(jsonPath("$.status").value("BAD_REQUEST")) // 응답 상태
+                .andExpect(jsonPath("$.message").value("Todo not found")); // 메시지가 예상대로 반환되는지 확인
     }
 }
