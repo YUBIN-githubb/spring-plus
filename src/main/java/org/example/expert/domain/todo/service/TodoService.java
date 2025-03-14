@@ -3,13 +3,12 @@ package org.example.expert.domain.todo.service;
 import lombok.RequiredArgsConstructor;
 import org.example.expert.client.WeatherClient;
 import org.example.expert.domain.common.dto.AuthUser;
-import org.example.expert.domain.common.exception.InvalidRequestException;
 import org.example.expert.domain.todo.dto.request.TodoSaveRequest;
+import org.example.expert.domain.todo.dto.response.ProjectionTodoResponse;
 import org.example.expert.domain.todo.dto.response.TodoResponse;
 import org.example.expert.domain.todo.dto.response.TodoSaveResponse;
 import org.example.expert.domain.todo.entity.Todo;
 import org.example.expert.domain.todo.repository.TodoRepository;
-import org.example.expert.domain.todo.repository.TodoRepositoryCustom;
 import org.example.expert.domain.todo.repository.TodoRepositoryImpl;
 import org.example.expert.domain.user.dto.response.UserResponse;
 import org.example.expert.domain.user.entity.User;
@@ -71,12 +70,12 @@ public class TodoService {
         Sort modifiedSort = Sort.by("modifiedAt").descending(); // 기본적으로 수정일 기준 내림차순 정렬
 
 
-        if(weather != null && (startDate == null && endDate == null)) { // 기간 검색만 있는 경우
+        if(weather != null && (startDate == null && endDate == null)) { // 날씨 검색만 있는 경우
 
             Pageable pageable = PageRequest.of(page - 1, size, modifiedSort);
             todos = todoRepository.findAllByWeather(weather, pageable);
 
-        }else if(weather == null && (startDate != null && endDate != null)) { // 날씨 검색만 있는 경우
+        }else if(weather == null && (startDate != null && endDate != null)) { // 기간 검색만 있는 경우
 
             PageRequest pageable = PageRequest.of(page - 1, size, modifiedSort);
             todos = todoRepository.findByModifiedAtBetween(startDate, endDate, pageable);
@@ -119,5 +118,44 @@ public class TodoService {
                 todo.getCreatedAt(),
                 todo.getModifiedAt()
         );
+    }
+
+    public Page<ProjectionTodoResponse> getTodoByQueryDSL(int page, int size, String title, LocalDateTime startDate, LocalDateTime endDate, String managerNickname) {
+        // 기본적으로 생성일 기준으로 최신순으로 정렬
+        Sort createdSort = Sort.by("createdAt").descending();
+        Pageable pageable = PageRequest.of(page - 1, size, createdSort);
+        Page<ProjectionTodoResponse> todos;
+
+        // 제목 + 생성일 기간 + 매니저이름
+        if ((startDate == null && endDate == null) &&title != null && managerNickname == null) {
+
+            todos = todoRepository.findByTitle(title, pageable);
+
+        } else if ((startDate != null && endDate != null) &&title == null && managerNickname == null) {
+
+            todos = todoRepository.findByCreatedAtBetween(startDate, endDate, pageable);
+
+        } else if (managerNickname != null && (startDate == null && endDate == null) &&title == null ) {
+
+            todos = todoRepository.findByManagerNickname(managerNickname, pageable);
+
+        } else if (startDate != null && endDate != null && managerNickname == null) {
+
+            todos = todoRepository.findByTitleAndCreatedAtBetween(title, startDate, endDate, pageable);
+
+        } else if (startDate == null && endDate == null && title != null && managerNickname != null) {
+
+            todos = todoRepository.findByTitleAndManagerNickname(title, managerNickname, pageable);
+
+        } else if(title != null && startDate != null && endDate != null && managerNickname != null) {
+
+            todos = todoRepository.findByTitleAndManagerNicknameAndCreatedAtBetween(title, managerNickname, startDate, endDate, pageable);
+
+        } else {
+            todos = todoRepository.findAllProjection(pageable);
+        }
+
+        return todos;
+
     }
 }
