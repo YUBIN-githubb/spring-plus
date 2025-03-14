@@ -1,5 +1,6 @@
 package org.example.expert.domain.todo.service;
 
+import com.querydsl.core.types.dsl.BooleanExpression;
 import lombok.RequiredArgsConstructor;
 import org.example.expert.client.WeatherClient;
 import org.example.expert.domain.common.dto.AuthUser;
@@ -124,38 +125,11 @@ public class TodoService {
         // 기본적으로 생성일 기준으로 최신순으로 정렬
         Sort createdSort = Sort.by("createdAt").descending();
         Pageable pageable = PageRequest.of(page - 1, size, createdSort);
-        Page<ProjectionTodoResponse> todos;
 
-        // 제목 + 생성일 기간 + 매니저이름
-        if ((startDate == null && endDate == null) &&title != null && managerNickname == null) {
+        // BooleanExpression을 이용하자 !!!
+        Page<ProjectionTodoResponse> results = todoRepository.findByTitleOrCreatedAtOrManagerNickname(title, startDate, endDate, managerNickname, pageable);
 
-            todos = todoRepository.findByTitle(title, pageable);
-
-        } else if ((startDate != null && endDate != null) &&title == null && managerNickname == null) {
-
-            todos = todoRepository.findByCreatedAtBetween(startDate, endDate, pageable);
-
-        } else if (managerNickname != null && (startDate == null && endDate == null) &&title == null ) {
-
-            todos = todoRepository.findByManagerNickname(managerNickname, pageable);
-
-        } else if (startDate != null && endDate != null && managerNickname == null) {
-
-            todos = todoRepository.findByTitleAndCreatedAtBetween(title, startDate, endDate, pageable);
-
-        } else if (startDate == null && endDate == null && title != null && managerNickname != null) {
-
-            todos = todoRepository.findByTitleAndManagerNickname(title, managerNickname, pageable);
-
-        } else if(title != null && startDate != null && endDate != null && managerNickname != null) {
-
-            todos = todoRepository.findByTitleAndManagerNicknameAndCreatedAtBetween(title, managerNickname, startDate, endDate, pageable);
-
-        } else {
-            todos = todoRepository.findAllProjection(pageable);
-        }
-
-        return todos;
+        return results;
 
     }
 }
