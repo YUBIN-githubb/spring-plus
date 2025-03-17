@@ -1,6 +1,7 @@
 package org.example.expert.domain.todo.repository;
 
 import com.querydsl.core.QueryResults;
+import com.querydsl.core.group.GroupBy;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -17,7 +18,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -44,9 +47,9 @@ public class TodoRepositoryImpl implements TodoRepositoryCustom {
     public Page<ProjectionTodoResponse> findByTitleOrCreatedAtOrManagerNickname(String title, LocalDateTime startDate, LocalDateTime endDate, String managerNickname, Pageable pageable) {
 
         List<ProjectionTodoResponse> results = jpaQueryFactory.select(
-                        Projections.constructor(ProjectionTodoResponse.class, // constructor 뭐임?
+                        Projections.constructor(ProjectionTodoResponse.class,
                                 todo.title,
-                                manager.countDistinct(), // count랑 countDistinct 차이 뭐임?
+                                manager.countDistinct(),
                                 comment.countDistinct())
                 ).from(todo)
                 .leftJoin(todo.managers, manager)
@@ -58,7 +61,7 @@ public class TodoRepositoryImpl implements TodoRepositoryCustom {
                 .groupBy(todo.id)
                 .offset(pageable.getOffset()) // 페이지 시작 위치
                 .limit(pageable.getPageSize()) // 페이지 크기
-                .fetch();// 전체 개수와 함께 가져오기
+                .fetch();
 
         return new PageImpl<>(results, pageable, results.size());
     }
