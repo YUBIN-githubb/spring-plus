@@ -65,6 +65,7 @@ class TodoControllerTest {
     }
 
     @Test
+    @WithMockAuthUser(userId = 1L, email = "test@test.com", role = UserRole.ROLE_USER)
     // 에러 로그 : 200을 예상했는데 400이 나왔다
     void todo_단건_조회_시_todo가_존재하지_않아_예외가_발생한다() throws Exception {
         // given
