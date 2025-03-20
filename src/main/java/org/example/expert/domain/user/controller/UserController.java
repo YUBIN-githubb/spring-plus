@@ -40,4 +40,11 @@ public class UserController {
         return ResponseEntity.ok(true);
     }
 
+    @GetMapping("/users/{nickname}")
+    public ResponseEntity<UserResponse> findByNickname(
+            @PathVariable String nickname) {
+        UserResponse result = userService.findByNickname(nickname);
+        return ResponseEntity.ok(result);
+    }
+
 }

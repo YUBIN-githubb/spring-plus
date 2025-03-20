@@ -70,4 +70,15 @@ public class UserService {
 
 
     }
+
+    public UserResponse findByNickname(String nickname) {
+
+        User foundUser = userRepository.findByNickname(nickname).orElseThrow(
+                () -> new InvalidRequestException("User not found")
+        );
+
+        return new UserResponse(
+                foundUser.getId(),
+                foundUser.getEmail());
+    }
 }
