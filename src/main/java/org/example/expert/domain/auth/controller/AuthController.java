@@ -20,7 +20,7 @@ public class AuthController {
 
     @GetMapping("auth/healthcheck")
     public String healthCheck() {
-        return "Load Balancer health check OK";
+        return "Load Balancer health check OK (´ε｀ )♡";
     }
 
 

@@ -28,6 +28,16 @@ public class User extends Timestamped {
     @Column(nullable = false)
     private String nickname;
 
+    @Column(name = "profile_url")
+    private String profileImageUrl;
+
+    @PrePersist
+    public void prePersist() {
+        if (this.profileImageUrl == null || this.profileImageUrl.isEmpty()) {
+            this.profileImageUrl = "java/org/example/expert/images/oiia_cat.jpg";
+        }
+    }
+
     public User(String email, String password, UserRole userRole, String nickname) {
         this.email = email;
         this.password = password;
@@ -51,5 +61,9 @@ public class User extends Timestamped {
 
     public void updateRole(UserRole userRole) {
         this.userRole = userRole;
+    }
+
+    public void setProfileImageUrl(String url) {
+        this.profileImageUrl = url;
     }
 }
