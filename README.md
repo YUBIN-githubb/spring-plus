@@ -39,7 +39,7 @@
 
 아래 링크에 접속하세요.
 
-https://fromyubin.com/auth/healthcheck
+🚀 서버 헬스 체크 URL: `https://fromyubin.com/auth/healthcheck`
 
 백그라운드 실행을 통해 EC2 서버와 연결이 끊기더라도 스프링 서버가 실행가능하도록 했습니다.
 
