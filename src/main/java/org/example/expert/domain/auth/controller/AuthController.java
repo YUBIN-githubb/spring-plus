@@ -18,7 +18,7 @@ public class AuthController {
 
     private final AuthService authService;
 
-    @GetMapping("auth/healthcheck")
+    @GetMapping("/auth/healthcheck")
     public String healthCheck() {
         return "Load Balancer health check OK (´ε｀ )♡";
     }
