@@ -51,30 +51,39 @@ nohup java -jar build/libs/expert-0.0.1-SNAPSHOT.jar &
 ## AWS 설정 스크린샷
 
 EC2 설정
+
 ![EC2](images/ec21.png)
 
 EC2 보안그룹
+
 ![EC2](images/ec22.png)
 
 Elastic IP
+
 ![Elastic IP](images/elasticIp.png)
 
 Load Balancer 설정
+
 ![Load Balancer](images/loadbalancer1.png)
 
 Load Balancer 보안그룹
+
 ![Load Balancer](images/loadbalancer2.png)
 
 RDS 설정
+
 ![RDS](images/rds.png)
 
 RDS 보안그룹
+
 ![RDS](images/rds2.png)
 
 Route 53 설정
+
 ![Route 53](images/route53.png)
 
 S3 설정
+
 ![S3](images/s3.png)
 
 
